@@ -9,10 +9,10 @@ try {
     // spin off the server
     app.listen(port, () => {
         console.log(
-            `🚀  Modular backend template service is ready at: http://localhost:${port}`
+            `🚀  Metaverse Magna Blockchain is ready at: http://localhost:${port}`
         );
         logger.info(
-            `🚀  Modular backend template service is ready at: http://localhost:${port}`
+            `🚀  Metaverse Magna Blockchain is ready at: http://localhost:${port}`
         );
     });
 } catch (err) {

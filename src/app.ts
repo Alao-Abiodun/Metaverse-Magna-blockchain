@@ -31,7 +31,7 @@ app.use('/v1', routes);
 app.get('/', (req: Request, res: Response) => {
     return successResponse(
         res,
-        'Welcome to modular backend template service 🚀'
+        'Metaverse Magna Blockchain 🚀'
     );
 });
 

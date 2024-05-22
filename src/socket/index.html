@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js" integrity="sha512-11t8Q+vY9JlCrr+PveZKTYJq8n7O09Y5X/pk/aMd3vJugSvu4xOunGEUzaADqL3I8cZKE/pBwwCfXzDkRJh2sQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+
+   <div class="chats">
+       <ul id="messages"></ul>
+   </div>
+
+   <div>
+       <input id="input" autocomplete="off" />
+       <button type="button">Send</button>
+   </div>
+
+<script>
+   const baseUrl = 'https://sandbox-api.tmraccess.com/chat?sender=patient&recipient=hospital';
+   // const baseUrl = 'http://localhost:5501/chat?sender=patient&recipient=hospital';
+   const socket = io(baseUrl, {
+       auth: {
+           token: "66433c0a0e35034d6e268148",
+       },
+       path: '/provider-socket'
+   });
+
+   socket.on("connect_error", (error) => {
+       console.log(error.message);
+   });
+
+   const input = document.getElementById('input');
+   const messages = document.getElementById('messages');
+
+   document.querySelector('button').addEventListener('click', () => {
+       const message = { message: input.value, messageType: 'chat' };
+
+       socket.emit('chatMessage', message);
+   });
+
+   socket.on('chatMessage', (data) => {
+       const { message, messageType, recipient } = data;
+       const item = document.createElement('li');
+       item.textContent = `${recipient}: ${message}`;
+       messages.appendChild(item);
+   })
+
+
+</script>
+
+
+<script>
+   // const uid = 567890;
+   // const agoraNameSocket = io('https://api.tmraccess.com/agoraName', {
+   //     auth: {
+   //         token: "6641f9507bfc23ffc117eee4",
+   //     },
+   //     query: {
+   //         "name": "Alao Abiodun",
+   //         "uid": uid,
+   //     },
+   //     path: '/provider-socket'
+   // });
+
+   // agoraNameSocket.on('newUser', (data) => {
+   //     if(data.uid != uid) {
+   //         console.log('newUser =>', data);
+   //     }
+   // });
+
+   // agoraNameSocket.on('existingUsers', (data) => {
+   //     console.log('existingUsers =>', data);
+   // });
+</script>
+
+</body>
+</html>

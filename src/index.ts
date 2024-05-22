@@ -1,13 +1,19 @@
 import 'dotenv/config'; // load env variables
 import app from './app';
+import { createServer } from 'http';
+import socket from './socket/index.socket';
 import logger from './services/logger.service';
 
 try {
     // TODO: authenticate db
     // set app port
     const port = Number(process.env.PORT) || 7001;
+
+    const httpServer = createServer(app);
+    socket(httpServer);
+
     // spin off the server
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
         console.log(
             `🚀  Metaverse Magna Blockchain is ready at: http://localhost:${port}`
         );

@@ -1,6 +1,5 @@
 import { Server } from 'socket.io';
-// import { findById } from '../repositories/appointment.repository';
-// import { create } from '../repositories/chat.repository';
+import web3 from 'web3';
 
 export default (app: Express.Application) => {
     try {
@@ -19,131 +18,68 @@ export default (app: Express.Application) => {
                 socket.on('disconnect', () => {
                     console.log('User disconnected ' + socket.id);
                 });
+
+                socket.on('subscribe', (filter) => {
+                    socket.join(filter);
+                });
+            
+                socket.on('unsubscribe', (filter) => {
+                    socket.leave(filter);
+                });
+            
+                socket.on('disconnect', () => {
+                    console.log('User disconnected ' + socket.id);
+                });
             } catch (error) {
                 console.error('socket connection error', error)
             }
         });
 
-        const chatNamespace = io.of('/chat');
+        // Listen to new blocks and fetch transactions
+        // web3.eth.subscribe('newBlockHeaders', async (error, blockHeader) => {
+        // if (error) {
+        //         console.error(error);
+        //         return;
+        // }
+        // const block = await web3.eth.getBlock(blockHeader.number, true);
 
-        chatNamespace.use(async (socket, next) => {
-            try {
-                console.log('Connect User to chat namespace middleware:' + socket.id);
-                const {
-                    query: { sender, recipient },
-                    auth: { token },
-                } = socket.handshake;
+        // block.transactions.forEach((tx) => {
+        //     const txData = {
+        //         sender: tx.from,
+        //         receiver: tx.to,
+        //         blockNumber: tx.blockNumber,
+        //         blockHash: tx.blockHash,
+        //             transactionHash: tx.hash,
+        //             gasPrice: tx.gasPrice,
+        //             value: tx.value,
+        //         };
 
-                // const appointment = await findById(String(token));
+        //         // Emit to all clients
+        //         io.to('all').emit('newTransaction', txData);
 
-                // if (!appointment || appointment.status !== 'pending') {
-                //     console.error('Appointment is not pending or invalid');
-                //     return next(new Error('Appointment is not pending'));
-                // }
+        //         // Emit based on value ranges
+        //         const valueInEth = web3.utils.fromWei(tx.value, 'ether');
+        //         if (valueInEth >= 0 && valueInEth <= 100) {
+        //             io.to('range_0_100').emit('newTransaction', txData);
+        //         } else if (valueInEth > 100 && valueInEth <= 500) {
+        //             io.to('range_100_500').emit('newTransaction', txData);
+        //         } else if (valueInEth > 500 && valueInEth <= 2000) {
+        //             io.to('range_500_2000').emit('newTransaction', txData);
+        //         } else if (valueInEth > 2000 && valueInEth <= 5000) {
+        //             io.to('range_2000_5000').emit('newTransaction', txData);
+        //         } else if (valueInEth > 5000) {
+        //             io.to('range_5000_plus').emit('newTransaction', txData);
+        //         }
 
-                // socket.data = { sender, recipient, appointmentId: token };
-                next();
-            } catch (error) {
-                console.log('Connect User -' + socket.id);
-                console.error('chat middleware error', error);
-            }
-        });
-
-        chatNamespace.on('connection', (socket) => {
-            try {
-                console.log('A user connected to chat namespace ' + socket.id);
-
-                socket.on('disconnect', () => {
-                    console.log(
-                        'User disconnected from chat namespace ' + socket.id
-                    );
-                });
-
-                const { appointmentId, sender, recipient } = socket.data;
-
-                const chatRoomSuffix = sender === 'patient' ? recipient : sender;
-                const chatRoomName = `${appointmentId}_${chatRoomSuffix}`;
-
-                // console.log('Chat room suffix: ', chatRoomSuffix);
-                // console.log('Chat room name: ', chatRoomName);
-
-                socket.join(chatRoomName);
-
-                // socket.on('chatMessage', async (data) => {
-                //     const { message, messageType } = data;
-                //     const { createdAt } = await create({
-                //         appointmentId,
-                //         sender,
-                //         recipient,
-                //         message,
-                //         messageType,
-                //     });
-                //     chatNamespace
-                //         .to(chatRoomName)
-                //         .emit('chatMessage', { message, messageType, sender, createdAt });
-                    
-                // });
-            } catch (error) {
-                console.error('chat namespace error', error);
-            }
-        });
-
-        const agoraNameHandlerNsp = io.of('/agoraName');
-
-        agoraNameHandlerNsp.use(async (socket, next) => {
-            try {
-                const {
-                    query: { name, uid },
-                    auth: { token },
-                } = socket.handshake;
-
-                // const appointment = await findById(String(token));
-
-                // if (!appointment || appointment.status !== 'pending') {
-                //     return next(new Error('Appointment is not pending'));
-                // }
-
-                socket.data = { uid, name, appointmentId: token };
-                next();
-            } catch (error) {
-                console.error('agora middleware error', error);
-            }
-        });
-
-        agoraNameHandlerNsp.on('connection', async (socket) => {
-            try {
-                console.log(
-                    'A user connected to agoraNameHandler namespace ' + socket.id
-                );
-    
-                socket.on('disconnect', () => {
-                    console.log(
-                        'User disconnected from agoraNameHandler namespace ' +
-                            socket.id
-                    );
-                });
-    
-                const { appointmentId, uid, name } = socket.data;
-    
-                const agoraNameHandlerRoomName = `${appointmentId}_agoraNameHandler`;
-    
-                socket.join(agoraNameHandlerRoomName);
-    
-                agoraNameHandlerNsp
-                    .to(agoraNameHandlerRoomName)
-                    .emit('newUser', { uid, name });
-    
-                const existingSocketUsers = await agoraNameHandlerNsp
-                    .to(agoraNameHandlerRoomName)
-                    .fetchSockets();
-                const existingSocketUsersData = existingSocketUsers.map(
-                    (socket) => socket.data
-                );
-                socket.emit('existingUsers', existingSocketUsersData);
-            } catch (error) {
-                console.error('agora namespace error: ', error);
-            }
-        });
+        //         // Emit based on sender and receiver addresses
+        //         if (tx.from) {
+        //             io.to(`sender_${tx.from}`).emit('newTransaction', txData);
+        //         }
+        //         if (tx.to) {
+        //             io.to(`receiver_${tx.to}`).emit('newTransaction', txData);
+        //         }
+        //     });
+        // });
     } catch (error) {
         console.error('socket server error: ', error);
     }

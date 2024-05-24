@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import express, { Request, Response, Application, NextFunction } from 'express';
 import compression from 'compression';
 import helmet from 'helmet';
@@ -25,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // mount routes
-app.use('/v1', routes);
+app.use('/api/v1', routes);
 
 // index route
 app.get('/', (req: Request, res: Response) => {
@@ -47,6 +48,7 @@ app.all('*', async (req: Request, res: Response, next: NextFunction) => {
 // handle global error
 app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
     logger.error(error);
+    console.log("error", error);
     const message =
         error.name === 'Error' ? 'Something went wrong' : error.message;
     const statusCode =

@@ -6,12 +6,12 @@ WORKDIR /usr/app
 # copy package.json
 COPY package.json ./
 # install dependencies
-RUN pnpm install
+RUN yarn install
 # copy source code
 COPY . .
 # build source file
-RUN pnpm run build
+RUN yarn build
 # expose port 3000
 EXPOSE 3000
 # start app
-CMD ["pnpm", "run", "start"]
+CMD ["yarn", "run", "start"]

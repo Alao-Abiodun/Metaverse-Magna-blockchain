@@ -1,7 +1,8 @@
 import { Router } from 'express';
 
-import { getAllUsers } from '../controllers/user.controller';
+import { signUp, login } from '../controllers/user.controller';
 
 export default (router: Router) => {
-    router.get('/users', getAllUsers);
+    router.post('/signup', signUp);
+    router.post('/login', login);
 };

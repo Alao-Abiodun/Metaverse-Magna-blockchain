@@ -1,3 +1,4 @@
+import { AppDataSource } from "./config/database.config"
 import 'dotenv/config'; // load env variables
 import app from './app';
 import { createServer } from 'http';
@@ -5,20 +6,28 @@ import socket from './socket/index.socket';
 import logger from './services/logger.service';
 
 try {
-    // TODO: authenticate db
+    AppDataSource
+    .initialize()
+    .then(() => {
+        console.log("Database is connected and initial")
+    })
+    .catch((err) => {
+        console.error("Error connecting to the database", err)
+    })
+
     // set app port
     const port = Number(process.env.PORT) || 7001;
-
+    // spin off the server
     const httpServer = createServer(app);
     socket(httpServer);
 
     // spin off the server
     httpServer.listen(port, () => {
         console.log(
-            `🚀  Metaverse Magna Blockchain is ready at: http://localhost:${port}`
+            `🚀  Metaverse Magna service is ready at: http://localhost:${port}`
         );
         logger.info(
-            `🚀  Metaverse Magna Blockchain is ready at: http://localhost:${port}`
+            `🚀  Metaverse Magna service is ready at: http://localhost:${port}`
         );
     });
 } catch (err) {
@@ -42,3 +51,4 @@ process.on('uncaughtException', async (error) => {
     logger.fatal(error);
     process.exit(1); //server needs to crash and a process manager will restart it
 });
+

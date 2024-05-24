@@ -19,13 +19,13 @@
    </div>
 
 <script>
-   const baseUrl = 'https://sandbox-api.tmraccess.com/chat?sender=patient&recipient=hospital';
-   // const baseUrl = 'http://localhost:5501/chat?sender=patient&recipient=hospital';
+//    const baseUrl = 'https://sandbox-api.tmraccess.com/chat?sender=patient&recipient=hospital';
+   const baseUrl = 'http://localhost:5501/event?sender=patient&recipient=hospital';
    const socket = io(baseUrl, {
        auth: {
            token: "66433c0a0e35034d6e268148",
        },
-       path: '/provider-socket'
+       path: '/block-socket'
    });
 
    socket.on("connect_error", (error) => {

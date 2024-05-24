@@ -45,6 +45,7 @@
       "postgrator": "^7.2.0",
       "reflect-metadata": "^0.1.13",
       "socket.io": "^4.7.5",
+      "typedi": "^0.10.0",
       "typeorm": "0.3.20",
       "web3": "^4.8.0"
    },

@@ -6,7 +6,6 @@ import cors from 'cors';
 import { errorResponse, successResponse } from './utils/lib/response';
 import { StatusCodes } from 'http-status-codes';
 import AppError from './utils/lib/appError';
-import logger from './services/logger.service';
 
 const app: Application = express();
 
@@ -47,7 +46,6 @@ app.all('*', async (req: Request, res: Response, next: NextFunction) => {
 
 // handle global error
 app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
-    logger.error(error);
     console.log("error", error);
     const message =
         error.name === 'Error' ? 'Something went wrong' : error.message;

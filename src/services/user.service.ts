@@ -1,7 +1,7 @@
 import { Container, Inject, Service } from 'typedi';
 import { UserRepository } from "../repositories/user.repository";
 import AppError from '../utils/lib/appError';
-import { comparePassword } from '../utils/helpers/bcrypt.helper';
+import { comparePassword, hashPassword } from '../utils/helpers/bcrypt.helper';
 
 
 @Service()
@@ -20,12 +20,14 @@ export class UserService {
             return new AppError('User already exists', 400);
         }
 
+        const hashedPassword = await hashPassword(password);
+
         const newUser = await this.userService.create({
             id: 0,
             firstName,
             lastName,
             email,
-            password
+            password: hashedPassword
         
         });
 

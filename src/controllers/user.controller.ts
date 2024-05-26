@@ -2,14 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import { successResponse } from '../utils/lib/response';
 import { StatusCodes } from 'http-status-codes';
 import tryCatch from '../utils/helpers/tryCatch.helper';
-import { IUsers } from '../types/user.types';
-import * as userRepository from '../repositories/user.repository';
-import { hashPassword, comparePassword } from "../utils/helpers/bcrypt.helper";
+import { hashPassword } from "../utils/helpers/bcrypt.helper";
 import AppError from '../utils/lib/appError';
 import { removePasswordFromObject } from '../utils/helpers/password.helper';
 import  { Container, Inject, Service } from 'typedi';
 import { UserService } from '../services/user.service';
 import { IUser } from '../entities/User';
+import { generateJwtToken } from '../utils/helpers/jwt.helper';
 
 
 @Service()
@@ -26,7 +25,7 @@ export class UserController {
                 firstName,
                 lastName,
                 email,
-                password: await hashPassword(password)
+                password
             });
 
             return successResponse(
@@ -45,10 +44,20 @@ export class UserController {
 
             const user: any = await this.userService.login({ email, password });
 
+            const userData = {
+                id: user.id,
+                email: user.email,
+            };
+
+            const userToken = generateJwtToken(userData, '7d');
+
             return successResponse(
                 res,
                 'User logged in successfully',
-                { data: { user: removePasswordFromObject(user)}},
+                { 
+                    data: { user: removePasswordFromObject(user)},
+                    token: userToken
+                 },
                 StatusCodes.OK
             );
 

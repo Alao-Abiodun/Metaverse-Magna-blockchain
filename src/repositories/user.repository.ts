@@ -7,11 +7,12 @@ import { User } from "../entities/User";
 export class UserRepository {
 
     public async create(user: User) {
-        const newUser = new User();
-        newUser.firstName = user.firstName;
-        newUser.lastName = user.lastName;
-        newUser.email = user.email;
-        newUser.password = user.password;
+        const newUser = AppDataSource.manager.create(User, {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            password: user.password,
+        });
         return await AppDataSource.manager.save(newUser);
     }
 

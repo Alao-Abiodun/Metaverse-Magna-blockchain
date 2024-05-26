@@ -8,73 +8,99 @@
 </head>
 <body>
 
+    <h1>Login</h1>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
 
-   <div class="chats">
+   <!-- <div class="chats">
        <ul id="messages"></ul>
    </div>
 
    <div>
        <input id="input" autocomplete="off" />
        <button type="button">Send</button>
-   </div>
+   </div> -->
 
 <script>
-//    const baseUrl = 'https://sandbox-api.tmraccess.com/chat?sender=patient&recipient=hospital';
-   const baseUrl = 'http://localhost:5501/event?sender=patient&recipient=hospital';
-   const socket = io(baseUrl, {
-       auth: {
-           token: "66433c0a0e35034d6e268148",
-       },
-       path: '/block-socket'
-   });
 
-   socket.on("connect_error", (error) => {
-       console.log(error.message);
-   });
+    async function login(username, password) {
+            try {
+                const response = await fetch('http://localhost:5501/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const token = data.token;
+                    connectToSocket(token);
+                } else {
+                    alert('Login failed: ' + response.statusText);
+                    console.error('Login failed:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error logging in:', error);
+            }
+        }
 
-   const input = document.getElementById('input');
-   const messages = document.getElementById('messages');
+        function connectToSocket(token) {
+            const socket = io('http://localhost:5501', {
+                auth: {
+                    token
+                },
+                path: '/api/v1'
+            });
 
-   document.querySelector('button').addEventListener('click', () => {
-       const message = { message: input.value, messageType: 'chat' };
+            socket.on('connect', () => {
+                console.log('Connected to the server');
+                socket.emit('message', 'Hello, server!');
+            });
 
-       socket.emit('chatMessage', message);
-   });
+            socket.on('message', (msg) => {
+                console.log('Received message:', msg);
+            });
 
-   socket.on('chatMessage', (data) => {
-       const { message, messageType, recipient } = data;
-       const item = document.createElement('li');
-       item.textContent = `${recipient}: ${message}`;
-       messages.appendChild(item);
-   })
+            socket.on('disconnect', () => {
+                console.log('Disconnected from the server');
+            });
 
+            socket.on('connect_error', (error) => {
+                console.error('Connection error:', error.message);
+            });
+
+            // const input = document.getElementById('input');
+            // const messages = document.getElementById('messages');
+        
+            
+            // document.querySelector('button').addEventListener('click', () => {
+            //     const message = { message: input.value, messageType: 'chat', recipient: 'hospital' };
+        
+            //     socket.emit('chatMessage', message);
+            // });
+            
+            // socket.on('chatMessage', (data) => {
+            //     const { message, messageType, recipient } = data;
+            //     const item = document.createElement('li');
+            //     item.textContent = `${recipient}: ${message}`;
+            //     messages.appendChild(item);
+            // });
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            login(username, password);
+        });
 
 </script>
 
-
-<script>
-   // const uid = 567890;
-   // const agoraNameSocket = io('https://api.tmraccess.com/agoraName', {
-   //     auth: {
-   //         token: "6641f9507bfc23ffc117eee4",
-   //     },
-   //     query: {
-   //         "name": "Alao Abiodun",
-   //         "uid": uid,
-   //     },
-   //     path: '/provider-socket'
-   // });
-
-   // agoraNameSocket.on('newUser', (data) => {
-   //     if(data.uid != uid) {
-   //         console.log('newUser =>', data);
-   //     }
-   // });
-
-   // agoraNameSocket.on('existingUsers', (data) => {
-   //     console.log('existingUsers =>', data);
-   // });
-</script>
 
 </body>
 </html>

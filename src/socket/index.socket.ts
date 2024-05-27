@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
-import web3 from 'web3';
-
+import { jwtMiddleware } from '../middlewares/authorization/socket.authorization';
+import { trackAndStreamTransactions } from '../utils/helpers/blocktransaction.helper';
+ 
 export default (app: Express.Application) => {
     try {
         const io = new Server(app, {
@@ -15,22 +16,30 @@ export default (app: Express.Application) => {
             try {
                 console.log('A user connected ' + socket.id);
 
-                socket.on('disconnect', () => {
-                    console.log('User disconnected ' + socket.id);
+                socket.on('subscribe', (data) => {
+                    const { type, address } = data;
+                    if (type === 'all') {
+                        socket.join('all');
+                    } else if (type === 'sender') {
+                        socket.join(address);
+                    } else if (type === 'receiver') {
+                        socket.join(address);
+                    } else if (type.startsWith('range:')) {
+                        socket.join(type);
+                    }
                 });
 
-                socket.on('message', (msg) => {
-                    console.log(`Received message from ${socket.id}: ${msg}`);
-                    io.emit('message', msg);
-                });
-            
                 socket.on('disconnect', () => {
                     console.log('User disconnected ' + socket.id);
                 });
             } catch (error) {
-                console.error('socket connection error', error)
+                console.error('socket connection error', error);
             }
         });
+
+        io.use(jwtMiddleware);
+
+        trackAndStreamTransactions(io);
     } catch (error) {
         console.error('socket server error: ', error);
     }

@@ -8,13 +8,13 @@ import { comparePassword, hashPassword } from '../utils/helpers/bcrypt.helper';
 export class UserService {
 
     constructor(
-        private userService: UserRepository = Container.get(UserRepository)
+        private userRepo: UserRepository = Container.get(UserRepository)
     ) { }
 
     public async createUser(data) {
         const { firstName, lastName, email, password } = data
 
-        const userExists = await this.userService.findByEmail(email);
+        const userExists = await this.userRepo.findByEmail(email);
 
         if (userExists) {
             return new AppError('User already exists', 400);
@@ -22,7 +22,7 @@ export class UserService {
 
         const hashedPassword = await hashPassword(password);
 
-        const newUser = await this.userService.create({
+        const newUser = await this.userRepo.create({
             id: 0,
             firstName,
             lastName,
@@ -36,7 +36,7 @@ export class UserService {
 
     public async login(data) {
         const { email, password } = data;
-        const user = await this.userService.findByEmail(email);
+        const user = await this.userRepo.findByEmail(email);
 
         if (!user) {
             return new AppError('Invalid credentials', 401);

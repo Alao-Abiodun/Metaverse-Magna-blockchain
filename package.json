@@ -26,6 +26,7 @@
    "dependencies": {
       "@axiomhq/pino": "1.0.0-rc.1",
       "@faker-js/faker": "^7.6.0",
+      "async": "^3.2.5",
       "aws-sdk": "^2.1373.0",
       "bcryptjs": "^2.4.3",
       "bullmq": "^3.13.1",

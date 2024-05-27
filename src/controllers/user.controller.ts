@@ -2,12 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { successResponse } from '../utils/lib/response';
 import { StatusCodes } from 'http-status-codes';
 import tryCatch from '../utils/helpers/tryCatch.helper';
-import { hashPassword } from "../utils/helpers/bcrypt.helper";
-import AppError from '../utils/lib/appError';
 import { removePasswordFromObject } from '../utils/helpers/password.helper';
 import  { Container, Inject, Service } from 'typedi';
 import { UserService } from '../services/user.service';
-import { IUser } from '../entities/User';
 import { generateJwtToken } from '../utils/helpers/jwt.helper';
 
 

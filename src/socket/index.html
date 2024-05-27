@@ -15,18 +15,22 @@
         <button type="submit">Login</button>
     </form>
 
-   <!-- <div class="chats">
-       <ul id="messages"></ul>
-   </div>
+    <div id="subscriptionControls" style="display:none;">
+        <h2>Subscribe to Events</h2>
+        <button onclick="subscribeToAllEvents()">All Events</button>
+        <button onclick="subscribeToAddressEvents()">Address Events</button>
+        <button onclick="subscribeToSenderEvents()">Sender Events</button>
+        <button onclick="subscribeToReceiverEvents()">Receiver Events</button>
+        <h2>Value Ranges</h2>
+        <button onclick="subscribeToRange('a')">0-100 USD</button>
+        <button onclick="subscribeToRange('b')">100-500 USD</button>
+        <button onclick="subscribeToRange('c')">500-2000 USD</button>
+        <button onclick="subscribeToRange('d')">2000-5000 USD</button>
+        <button onclick="subscribeToRange('e')">>5000 USD</button>
+    </div>
 
-   <div>
-       <input id="input" autocomplete="off" />
-       <button type="button">Send</button>
-   </div> -->
-
-<script>
-
-    async function login(username, password) {
+    <script>
+        async function login(username, password) {
             try {
                 const response = await fetch('http://localhost:5501/api/v1/login', {
                     method: 'POST',
@@ -39,6 +43,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     const token = data.token;
+                    document.getElementById('subscriptionControls').style.display = 'block';
                     connectToSocket(token);
                 } else {
                     alert('Login failed: ' + response.statusText);
@@ -49,8 +54,10 @@
             }
         }
 
+        let socket;
+        
         function connectToSocket(token) {
-            const socket = io('http://localhost:5501', {
+            socket = io('http://localhost:5501', {
                 auth: {
                     token
                 },
@@ -59,7 +66,6 @@
 
             socket.on('connect', () => {
                 console.log('Connected to the server');
-                socket.emit('message', 'Hello, server!');
             });
 
             socket.on('message', (msg) => {
@@ -73,23 +79,35 @@
             socket.on('connect_error', (error) => {
                 console.error('Connection error:', error.message);
             });
+        }
 
-            // const input = document.getElementById('input');
-            // const messages = document.getElementById('messages');
-        
-            
-            // document.querySelector('button').addEventListener('click', () => {
-            //     const message = { message: input.value, messageType: 'chat', recipient: 'hospital' };
-        
-            //     socket.emit('chatMessage', message);
-            // });
-            
-            // socket.on('chatMessage', (data) => {
-            //     const { message, messageType, recipient } = data;
-            //     const item = document.createElement('li');
-            //     item.textContent = `${recipient}: ${message}`;
-            //     messages.appendChild(item);
-            // });
+        function subscribeToAllEvents() {
+            socket.emit('subscribe', 'all');
+        }
+
+        function subscribeToAddressEvents() {
+            const address = prompt('Enter the address to subscribe to:');
+            if (address) {
+                socket.emit('subscribe', `address:${address}`);
+            }
+        }
+
+        function subscribeToSenderEvents() {
+            const address = prompt('Enter the address to subscribe as sender:');
+            if (address) {
+                socket.emit('subscribe', `sender:${address}`);
+            }
+        }
+
+        function subscribeToReceiverEvents() {
+            const address = prompt('Enter the address to subscribe as receiver:');
+            if (address) {
+                socket.emit('subscribe', `receiver:${address}`);
+            }
+        }
+
+        function subscribeToRange(range) {
+            socket.emit('subscribe', `range:${range}`);
         }
         
         document.getElementById('loginForm').addEventListener('submit', (event) => {
@@ -99,8 +117,7 @@
             login(username, password);
         });
 
-</script>
-
+    </script>
 
 </body>
 </html>

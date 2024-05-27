@@ -32,17 +32,17 @@ try {
 }
 
 process.on('SIGINT', async () => {
-    AppDataSource.close();
+    AppDataSource.destroy();
     process.exit(0);
 });
 
 process.on('unhandledRejection', async (error) => {
-    AppDataSource.close();
+    AppDataSource.destroy();
     process.exit(1); //server needs to crash and a process manager will restart it
 });
 
 process.on('uncaughtException', async (error) => {
-    AppDataSource.close();
+    AppDataSource.destroy();
     process.exit(1); //server needs to crash and a process manager will restart it
 });
 

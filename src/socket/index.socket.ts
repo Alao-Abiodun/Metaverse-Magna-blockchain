@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import { jwtMiddleware } from '../middlewares/authorization/socket.authorization';
-import { trackAndStreamTransactions } from '../utils/helpers/blocktransaction.helper';
+import { trackAndStreamTransactions } from './blocktransaction';
  
 export default (app: Express.Application) => {
     try {

@@ -10,7 +10,7 @@ The project is implemented using the modular based architecture.
 ## How to install from source
 - Clone the repository - `git clone repo-link`
 - `cd project-folder`
-- You need to have valid MariaDB database and Redis connection
+- You need to have valid mySQL or Postgres database connection
 - Install dependencies - `yarn install`
 - Setup environment variable - `cp .env.example .env`
 - Run development server `yarn dev`

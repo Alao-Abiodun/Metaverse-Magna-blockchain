@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import path from 'path';
 import express, { Request, Response, Application, NextFunction } from 'express';
 import compression from 'compression';
 import helmet from 'helmet';
@@ -23,9 +24,15 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, './socket')))
 
 // mount routes
 app.use('/api/v1', routes);
+
+// server the index.html file
+// app.get('/socket-ui', (req: Request, res: Response) => {
+//     res.sendFile(path.resolve(__dirname, './socket/index.html'));
+// })
 
 // index route
 app.get('/', (req: Request, res: Response) => {

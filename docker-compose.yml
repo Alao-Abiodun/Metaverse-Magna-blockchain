@@ -1,13 +1,18 @@
 version: '3.9'
 services:
-  microservice1:
-    build: .
-    ports:
-      - "7001:7001"
+  postgres:
+    image: "postgres:latest"
     restart: always
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: metaverse_magna_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5436:5432"
     volumes:
-      - /usr/app/node_modules
-      - .:/usr/app
+      - db_data:/var/lib/postgresql/data
+volumes:
+  db_data:
+    driver: local
+
 

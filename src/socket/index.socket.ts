@@ -13,33 +13,12 @@ export default (app: Express.Application) => {
         });
 
         io.on('connection', (socket) => {
-            try {
-                console.log('A user connected ' + socket.id);
-
-                socket.on('subscribe', (data) => {
-                    const { type, address } = data;
-                    if (type === 'all') {
-                        socket.join('all');
-                    } else if (type === 'sender') {
-                        socket.join(address);
-                    } else if (type === 'receiver') {
-                        socket.join(address);
-                    } else if (type.startsWith('range:')) {
-                        socket.join(type);
-                    }
-                });
-
-                socket.on('disconnect', () => {
-                    console.log('User disconnected ' + socket.id);
-                });
-            } catch (error) {
-                console.error('socket connection error', error);
-            }
+            console.log('A metaverse magnet connected to websocket')
         });
 
-        io.use(jwtMiddleware);
+        // io.use(jwtMiddleware);
 
-        trackAndStreamTransactions(io);
+        // trackAndStreamTransactions(io);
     } catch (error) {
         console.error('socket server error: ', error);
     }
